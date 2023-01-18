@@ -45,8 +45,65 @@
 
 ### Problems to Solve
 
-- How to get location data on init
-- How to get weather data for acquired location
-- How to implement fingerprint lock
-- How to implement markdown-to-display
-- How to do wiki stuff
+- [x] How to get location data on init
+- [x] How to get weather data for acquired location
+- [ ] How to implement fingerprint lock
+- [ ] How to implement markdown-to-display
+- [ ] How to do wiki stuff
+
+### New Save Screen
+
+Header --- "New Save", options button
+Date field, defaults to now, click to open datetime
+Location | Weather, default strings, click to edit
+
+Title
+
+Tags
+
+Body
+
+Footer --- Mood, reading, watching, listening, eating, drinking, doing
+
+### Quicksave Dialog
+
+- Date, location, weather
+- Tags
+- Title is "Quicksave (timestamp)"
+- No body, just some pre-entered text chips that can be touched to toggle
+- WRUD not included
+
+### Save/Quicksave structure
+
+{
+	id: uuid
+	title: string
+	body: string
+	loc: string
+	weather: string
+	date: integer
+	tags: [ tag1, tag2, ... ]
+	mood: string
+	reading: string
+	watching: string
+	listening: string
+	eating: string
+	drinking: string
+	doing/working on: string
+	quizData: {
+		quiz: { ... },
+		answers: { ... }
+	},
+	images: { ... }
+	meta: {
+		created: int
+		modified: int
+		locData: { lat, long, maybe the whole Here object, or just the raw phone data }
+		weatherData: { whatever the API gave us }
+	}
+}
+
+I'm not sure if it's better to store the objects in an array or in an object
+indexed by ID or timestamp.  Probably object indexed by timestamp since that will
+make sorting and retrieving a range of keys (dates) straightforward, and we'll be
+doing that a lot for the timeline.
