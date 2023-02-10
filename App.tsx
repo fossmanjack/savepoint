@@ -52,18 +52,30 @@ export default function App() {
 	// I don't want to deal with that and it's unneeded for this app anyway.
 
 	useEffect(_ => {
-		if(location) {
-			let localLat = location.coords.latitude;
-			let localLong = location.coords.longitude;
-			let localAlt = location.coords.altitude;
+		const fetchLocationData = async _ => {
+			if(location) {
+				let localLat: string = location.coords.latitude;
+				let localLong: string = location.coords.longitude;
+				let localAlt: string = location.coords.altitude;
 
-			setLat(localLat);
-			setLong(localLong);
-			setAlt(localAlt);
-			let url: string = `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?prox=${localLat},${localLong},${localAlt}&`+
-				`mode=${mode}&maxresults=${maxresults}&gen=${gen}&apiKey=${APIKEY}`;
-			console.log('URL:', url);
+				setLat(localLat);
+				setLong(localLong);
+				setAlt(localAlt);
+				let url: string = `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?prox=${localLat},${localLong},${localAlt}&`+
+					`mode=${mode}&maxresults=${maxresults}&gen=${gen}&apiKey=${APIKEY}`;
+				console.log('URL:', url);
 
+				const locData = await fetch(url);
+				const locJson = await locData.json();
+
+				setLocString(locJson.Response.View[0].Result[0].Location.Address.Label);
+				setZip(locJson.Response.View[0].Result[0].Location.Address.PostalCode);
+			}
+		};
+		fetchLocationData();
+	}, [ location ]);
+
+			/*
 			fetch(url)
 				.then(res => res.json())
 				.then(data => {
@@ -72,7 +84,6 @@ export default function App() {
 					setLocString(data.Response.View[0].Result[0].Location.Address.Label);
 					setZip(data.Response.View[0].Result[0].Location.Address.PostalCode);
 				})
-				/*
 				.then(res => {
 					//console.log('Here result:', res);
 					res.json();
@@ -87,7 +98,6 @@ export default function App() {
 						console.log('Couldn\'t find location data');
 					}
 				})
-				*/
 				.catch(err => {
 					console.log('Error getting reverse geocode:', err);
 				});
@@ -95,6 +105,8 @@ export default function App() {
 		}
 	}, [ location ]);
 
+			*/
+/*
 	useEffect(_ => {
 		if(zip) {
 			let url: string = `https://api.weatherapi.com/v1/current.json?key=${WEATHERAPI}&q=${zip}&aqi=yes`;
@@ -114,6 +126,38 @@ export default function App() {
 
 		}
 	}, [ zip ]);
+*/
+	useEffect(_ => {
+		if(locString) {
+			let url: string = `https://api.weatherapi.com/v1/current.json?key=${WEATHERAPI}&q=${locString}&aqi=yes`;
+			fetch(url)
+				.then(res => res.json())
+				.then(data => {
+					const { condition, temp_f } = data.current;
+					const { text, icon } = condition;
+
+					setWeatherString(`${temp_f}, ${text}`);
+					setWeatherIcon(icon);
+
+				})
+				.catch(err => {
+					console.log('Error getting weather:', err);
+				});
+
+		}
+	}, [ locString ]);
+
+
+/*
+	let text = 'Waiting...';
+
+	if(errorMsg) {
+		text = errorMsg;
+	} else if(location) {
+		text = `Latitude: ${lat}\nLongitude: ${long}\nAltitude: ${alt}\n${locString}\n${weatherString}`;
+		//text = JSON.stringify(location);
+	}
+*/
 
 
 	let text = 'Waiting...';
@@ -141,3 +185,4 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 });
+

@@ -81,7 +81,7 @@ Footer --- Mood, reading, watching, listening, eating, drinking, doing
 	body: string
 	loc: string
 	weather: string
-	date: integer
+	datetime: int				// this is the displayed date and time, the creation is in the meta object
 	tags: [ tag1, tag2, ... ]
 	mood: string
 	reading: string
@@ -107,3 +107,25 @@ I'm not sure if it's better to store the objects in an array or in an object
 indexed by ID or timestamp.  Probably object indexed by timestamp since that will
 make sorting and retrieving a range of keys (dates) straightforward, and we'll be
 doing that a lot for the timeline.
+
+const _Saves = {
+	timestamp: { Save object },
+	timestamp: { Save object },
+	...
+}
+
+On the other hand, consider what we're mostly using that object for: a timeline view,
+sorted in reverse chronological order.  This will make use of a FlatList, which wants an
+array as its input.  Of course, Object.keys(_Saves) would do the trick just fine.
+
+Eh.  Let's start by using an array of objects and make the change if it creates problems.
+
+### Markdown
+
+Save bodies are stored with markdown intact and are converted to JSX on the fly.
+What I need is a markdown-to-JSX converter that also converts things in \[\[tags\]\] to
+Pressables that open the linked entry in a pop-up.  It also needs to be able to convert
+external links to React Linking objects, right.
+
+- markdown-to-jsx -- for React, might not work with RN?  But outputs a JSX component so maybe ...
+- react-markdown is another one to try
