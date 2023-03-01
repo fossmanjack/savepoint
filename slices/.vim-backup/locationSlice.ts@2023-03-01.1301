@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as Location from 'expo-location';
-import * as SunCalc from 'suncalc';
 
 const reverseGeocodeUrl = 'https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json';
 const geocodeApiKey = 'dG1haM9vsYI7NJ1Qj3At8w0O_sopnYGtJ5OEnBkladY';
@@ -12,17 +11,10 @@ const weatherApiKey = 'f7ce5b523356463dbfb215652231701';
 
 const initialState = {
 	locationObject: {},
-	geocodeObject: {},
 	weatherObject: {},
-	almanacObject: {},
-	isLoading: true,
-	errMess: null,
+	loading: false,
 }
 
-export const fetchLocationData = createAsyncThunk(
-	'location/fetchLocationData',
-	async _ => await getLocationData()
-);
 
 // Grabs GPS data using expo-location
 const getLocationData = async _ => {
@@ -41,6 +33,8 @@ export const fetchLocationGeocode = async ({ latitude: string, longitude: string
 		`mode=${mode}&maxresults=${maxresults}&gen=${gen}&apiKey=${geocodeApiKey}`;
 
 
+	//const locData = await fetch(url);
+	//const locJson = await locData.json();
 	const locJson = await (await fetch(url)).json();
 
 	return locJson.Response.View[0].Result[0].Location.Address.Label;
@@ -50,7 +44,8 @@ export const fetchLocationGeocode = async ({ latitude: string, longitude: string
 export const fetchWeatherData = async locString => {
 	let url: string = `${weatherUrl}?key=${weatherApiKey}&q=${locString}&aqi=yes`;
 
-	const wJson = await (await fetch(url)).json();
+	const wData = await fetch(url);
+	const wJson = await wData.json();
 
 	const { condition, temp_f, temp_c } = wJson.current;
 	const { text, icon } = condition;
@@ -58,82 +53,14 @@ export const fetchWeatherData = async locString => {
 	return { temp_f, temp_c, text, icon };
 }
 
-// use SunCalc to calculate sun and moon times
-export const generateAlmanacData = locOb => {
-	const { latitude: string, longitude: string } = locOb.coords;
-
-	// we want sunrise, sunset, moonrise, moonset, moon percentage
-	const date = new Date();
-	const latInt = parseFloat(latitude);
-	const longInt = parseFloat(longitude);
-
-	const sunData = SunCalc.getTimes(date, latInt, longInt);
-	const moonData = SunCalc.getMoonTimes(date, latInt, longInt);
-	const moonPhase = SunCalc.getMoonIllumination(date);
-
-	return {
-		sunrise: sunData.sunrise,
-		sunset: sunData.sunset,
-		moonrise: moonData.rise,
-		moonset: moonData.set,
-		moonphase: moonPhase.fraction
-	};
-}
-
 export const locationSlice = createSlice({
 	name: 'location',
 	initialState,
-	reducers: {
-		setLocationObject: (lState, action) => {
-			return {
-				...lState,
-				locationObject: action.payload,
-			};
-		},
-		setWeatherObject: (lState, action) => {
-			return {
-				...lState,
-				weatherObject: action.payload,
-			};
-		},
-		setGeocodeObject: (lState, action) => {
-			return {
-				...lState,
-				geocodeObject: action.payload,
-			};
-		},
-		setAlmanacObject: (lState, action) => {
-			return {
-				...lState,
-				almanacObject: action.payload,
-			};
-		},
-	},
+	reducers: {},
 	extraReducers: {
-		[fetchLocationData.pending]: (lState) => {
-			lState.isLoading = true;
-		},
-		[fetchLocationData.fulfilled]: (lState, action) => {
-			lState.isLoading = false;
-			lState.errMess = null;
-			lState.locationObject = action.payload;
-		},
-		[fetchLocationData.rejected]: (lState, action) => {
-			lState.isLoading = false;
-			state.errMess = action.error ? action.error.message : 'Fetch failed';
-		},
 
 	},
 });
-
-export const locationReducer = locationSlice.reducer;
-
-export const {
-	setLocationObject,
-	setGeocodeObject,
-	setWeatherObject,
-	setAlmanacObject
-} = locationSlice.actions;
 
 
 

@@ -16,7 +16,7 @@ const initialState = {
 	weatherObject: {},
 	almanacObject: {},
 	isLoading: true,
-	errMess: null,
+	errMess = null,
 }
 
 export const fetchLocationData = createAsyncThunk(
@@ -41,6 +41,8 @@ export const fetchLocationGeocode = async ({ latitude: string, longitude: string
 		`mode=${mode}&maxresults=${maxresults}&gen=${gen}&apiKey=${geocodeApiKey}`;
 
 
+	//const locData = await fetch(url);
+	//const locJson = await locData.json();
 	const locJson = await (await fetch(url)).json();
 
 	return locJson.Response.View[0].Result[0].Location.Address.Label;
@@ -50,6 +52,8 @@ export const fetchLocationGeocode = async ({ latitude: string, longitude: string
 export const fetchWeatherData = async locString => {
 	let url: string = `${weatherUrl}?key=${weatherApiKey}&q=${locString}&aqi=yes`;
 
+	//const wData = await fetch(url);
+	//const wJson = await wData.json();
 	const wJson = await (await fetch(url)).json();
 
 	const { condition, temp_f, temp_c } = wJson.current;
@@ -58,7 +62,6 @@ export const fetchWeatherData = async locString => {
 	return { temp_f, temp_c, text, icon };
 }
 
-// use SunCalc to calculate sun and moon times
 export const generateAlmanacData = locOb => {
 	const { latitude: string, longitude: string } = locOb.coords;
 
@@ -96,44 +99,11 @@ export const locationSlice = createSlice({
 				weatherObject: action.payload,
 			};
 		},
-		setGeocodeObject: (lState, action) => {
-			return {
-				...lState,
-				geocodeObject: action.payload,
-			};
-		},
-		setAlmanacObject: (lState, action) => {
-			return {
-				...lState,
-				almanacObject: action.payload,
-			};
-		},
 	},
 	extraReducers: {
-		[fetchLocationData.pending]: (lState) => {
-			lState.isLoading = true;
-		},
-		[fetchLocationData.fulfilled]: (lState, action) => {
-			lState.isLoading = false;
-			lState.errMess = null;
-			lState.locationObject = action.payload;
-		},
-		[fetchLocationData.rejected]: (lState, action) => {
-			lState.isLoading = false;
-			state.errMess = action.error ? action.error.message : 'Fetch failed';
-		},
 
 	},
 });
-
-export const locationReducer = locationSlice.reducer;
-
-export const {
-	setLocationObject,
-	setGeocodeObject,
-	setWeatherObject,
-	setAlmanacObject
-} = locationSlice.actions;
 
 
 
