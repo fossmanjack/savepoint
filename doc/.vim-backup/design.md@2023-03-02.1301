@@ -38,15 +38,10 @@
 
 ### Design
 
-- ~~App opens directly to entry screen with bottom-tab navigation~~
+- App opens directly to entry screen with bottom-tab navigation
 - Floating action button opens quicksave dialog
 - Quicksave auto-populates with location and weather, and has a selection of user-provided messages
 - App background customizable
-- Revamp
-- App opens to timeline
-- Other screens: rolodex, quizzes, habit tracker
-- Speed dial to add new contact, new save, new quicksave, each with their own dialog
-
 
 ### Problems to Solve
 
