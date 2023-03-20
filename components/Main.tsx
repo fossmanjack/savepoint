@@ -20,6 +20,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Button, Icon } from '@rneui/themed';
 
 // Screens
+import SaveScreen from '../screens/SaveScreen';
 import TimelineScreen from '../screens/TimelineScreen';
 import RolodexScreen from '../screens/RolodexScreen';
 import QuizScreen from '../screens/QuizScreen';
