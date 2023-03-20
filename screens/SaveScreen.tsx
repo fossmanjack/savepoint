@@ -1,4 +1,9 @@
-
+import { useDispatch, useSelector } from 'react-redux';
+import {
+	TextInput,
+	View
+} from 'react-native';
+import { useState } from 'react';
 
 export default function SaveScreen() {
 

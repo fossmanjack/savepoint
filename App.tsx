@@ -2,6 +2,9 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import * as Location from 'expo-location';
 import { useState, useEffect } from 'react';
+import { Provider } from 'react-redux';
+import { _Store } from './assets/redux/_Store';
+import SaveScreen from './screens/SaveScreen';
 
 export default function App() {
 	const [ location, setLocation ] = useState(null);
@@ -169,11 +172,21 @@ export default function App() {
 		//text = JSON.stringify(location);
 	}
 
+/*
 	return (
-		<View style={styles.container}>
-			<Text>{text}</Text>
-			<StatusBar style="auto" />
-		</View>
+		<Provider store={_Store}>
+			<View style={styles.container}>
+				<Text>{text}</Text>
+				<StatusBar style="auto" />
+			</View>
+		</Provider>
+	);
+*/
+
+	return (
+		<Provider store={_Store}>
+			<SaveScreen />
+		</Provider>
 	);
 }
 

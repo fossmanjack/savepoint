@@ -11,7 +11,7 @@ import {
 	TextInput,
 	View
 } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { StatusBar } from 'expo-status-bar';
 
 // Community imports
@@ -28,3 +28,19 @@ import DevScreen from '../screens/DevScreen';
 
 // Assets and utils
 
+export default function Main() {
+
+	return (
+
+	);
+};
+
+/* Notes
+
+- Loading this screen calls an age check on location data; if more than timeout
+(default 1 hour), dispatch thunk to update
+- This screen also calls out the age check every five minutes
+
+
+
+*/

@@ -6,5 +6,8 @@
 - [ ] Rolodex
 - [ ] Create quizzes
 - [ ] Schedule quizzes
-- [ ] Quiz repo
 - [ ] Refactor entirely to TS
+- [ ] Encrypt storage
+- [ ] Fingerprint unlock
+- [ ] Import/export entries and quizzes
+- [ ] Quiz repo
