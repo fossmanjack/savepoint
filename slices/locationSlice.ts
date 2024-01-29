@@ -32,11 +32,13 @@ const getLocationData = async _ => {
 	}
 
 	let location = await Location.getCurrentPositionAsync({});
+	console.log('locationSlice: getLocationData', location);
 	return location; // { coords: { latitude, longitude, altitude }, ... }
 };
 
 // Reverse geocodes based on location data using Here API
-export const fetchLocationGeocode = async ({ latitude: string, longitude: string, altitude: string }) => {
+/*
+export const fetchLocationGeocode = async ({ latitude, longitude, altitude }) => {
 	let url: string = `${reverseGeocodeUrl}?prox=${latitude},${longitude},${altitude}&`+
 		`mode=${mode}&maxresults=${maxresults}&gen=${gen}&apiKey=${geocodeApiKey}`;
 
@@ -45,6 +47,22 @@ export const fetchLocationGeocode = async ({ latitude: string, longitude: string
 
 	return locJson.Response.View[0].Result[0].Location.Address.Label;
 }
+*/
+
+export const fetchGeocodeData = async locationObject => {
+	const { latitude, longitude, altitude } = locationObject.coords;
+
+	let url: string = `${reverseGeocodeUrl}?prox=${latitude},${longitude},${altitude}&`+
+		`mode=${mode}&maxresults=${maxresults}&gen=${gen}&apiKey=${geocodeApiKey}`;
+
+	const geoData = await (await fetch(url)).json();
+
+	return geoData;
+	// geoData.Response.View[0].Result[0].Location.Address.Label is the specific bit of data we want
+}
+
+export const getLocString = geocodeObject => geocodeObject.Response.View[0].Result[0].Location.Address.Label ?? 'Unknown';
+
 
 // Gets weather based on location label using WeatherAPI
 export const fetchWeatherData = async locString => {
@@ -52,15 +70,36 @@ export const fetchWeatherData = async locString => {
 
 	const wJson = await (await fetch(url)).json();
 
-	const { condition, temp_f, temp_c } = wJson.current;
+	//const { condition, temp_f, temp_c } = wJson.current;
+	//const { text, icon } = condition;
+
+	//return { temp_f, temp_c, text, icon };
+	return wJson;
+	// wJson = {
+	// 		current: {
+	// 			condition: {
+	// 				text, icon
+	// 			},
+	// 			temp_f,
+	// 			temp_c
+	// 		}
+	// 	}
+}
+
+export const getWeatherString = weatherObject => {
+	const { condition, temp_f, temp_c } = weatherObject.current;
 	const { text, icon } = condition;
 
-	return { temp_f, temp_c, text, icon };
+	const temp: string = temp_f ?? '??F';
+	const currentConditions: string = text ?? 'Unknown';
+
+	// Later we'll implement F/C options but for now ...
+	return `${temp}, ${currentConditions}`;
 }
 
 // use SunCalc to calculate sun and moon times
 export const generateAlmanacData = locOb => {
-	const { latitude: string, longitude: string } = locOb.coords;
+	const { latitude, longitude } = locOb.coords;
 
 	// we want sunrise, sunset, moonrise, moonset, moon percentage
 	const date = new Date();
@@ -71,6 +110,8 @@ export const generateAlmanacData = locOb => {
 	const moonData = SunCalc.getMoonTimes(date, latInt, longInt);
 	const moonPhase = SunCalc.getMoonIllumination(date);
 
+	// Since Suncalc doesn't return just an object containing everything we
+	// want to know, we'll roll our own and return that
 	return {
 		sunrise: sunData.sunrise,
 		sunset: sunData.sunset,
@@ -85,18 +126,21 @@ export const locationSlice = createSlice({
 	initialState,
 	reducers: {
 		setLocationObject: (lState, action) => {
+			// locationObject is the data returned from the Location API
 			return {
 				...lState,
 				locationObject: action.payload,
 			};
 		},
 		setWeatherObject: (lState, action) => {
+			// weatherObject is the data returned from weatherAPI
 			return {
 				...lState,
 				weatherObject: action.payload,
 			};
 		},
 		setGeocodeObject: (lState, action) => {
+			// geocodeObject is the data returned from Here API
 			return {
 				...lState,
 				geocodeObject: action.payload,
